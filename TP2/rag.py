@@ -1,11 +1,4 @@
-"""Couche d'indexation et de retrieval du TP2 (lexical BM25).
 
-Stratégie :
-  - chaque décision est découpée en chunks (~1000 caractères, léger chevauchement)
-  - un index BM25 est construit sur tous les chunks
-  - recherche d'affaires : on cherche les meilleurs chunks, puis on garde le meilleur chunk par affaire
-  - question sur UNE affaire : mini-index BM25 sur les chunks de cette affaire seulement
-"""
 import json
 import re
 import unicodedata
@@ -107,8 +100,9 @@ class Index:
         return [passages[i] for i in sorted(meilleurs)]
 
     def passages_pour_resume(self, case_id: str) -> list:
-        """Début (faits, procédure) + fin (décision) de la décision."""
+        """Début (faits, procédure) + fin (décision) de la décision : 3 passages au maximum.
+        On limite le texte envoyé au modèle pour garder un temps de réponse raisonnable sur CPU."""
         passages = self.passages_affaire(case_id)
-        if len(passages) <= 5:
+        if len(passages) <= 3:
             return passages
-        return passages[:3] + passages[-2:]
+        return passages[:2] + passages[-1:]

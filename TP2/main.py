@@ -1,11 +1,6 @@
-"""Backend FastAPI du TP2 : orchestration du RAG.
 
-Lancer :  uvicorn main:app --reload
-Endpoints :
-  GET  /search?q=...&k=5   -> affaires les plus pertinentes
-  POST /summary            -> résumé d'une affaire
-  POST /ask                -> question sur une affaire (réponse + passages utilisés)
-"""
+import time
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -38,6 +33,19 @@ def formater_passages(passages: list) -> str:
     return "\n\n".join(f"[P{i}] {p['text']}" for i, p in enumerate(passages, start=1))
 
 
+def generer(prompt: str, max_tokens: int = 300) -> str:
+    """Appelle le LLM. Les erreurs sont visibles : 503 si Ollama est injoignable, 502 si la réponse est vide."""
+    debut = time.time()
+    try:
+        reponse = appeler_llm(prompt, max_tokens=max_tokens)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    print(f"[LLM] réponse en {time.time() - debut:.1f} s ({len(prompt)} caractères envoyés)", flush=True)
+    if not reponse.strip():
+        raise HTTPException(status_code=502, detail="Le modèle a renvoyé une réponse vide. Réessaie.")
+    return reponse
+
+
 @app.get("/search")
 def rechercher(q: str, k: int = 5):
     return {"query": q, "resultats": index.search_cases(q, k)}
@@ -62,10 +70,7 @@ Règles :
 - Si une rubrique n'est pas dans les extraits, écris « Non précisé dans les extraits ».
 - N'invente ni noms, ni dates, ni montants."""
 
-    try:
-        resume = appeler_llm(prompt)
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    resume = generer(prompt, max_tokens=350)
     return {"case_id": demande.case_id, "titre": titre_affaire(index.cas[demande.case_id]), "resume": resume}
 
 
@@ -86,9 +91,6 @@ Règles :
 - Si la réponse n'est pas dans les passages, réponds exactement : « {PAS_DE_REPONSE} »
 - N'invente rien."""
 
-    try:
-        reponse = appeler_llm(prompt)
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    reponse = generer(prompt, max_tokens=250)
     return {"reponse": reponse, "passages": [{"id": f"P{i}", "texte": p["text"]}
                                              for i, p in enumerate(passages, start=1)]}
