@@ -1,9 +1,4 @@
-"""Lance les 3 scénarios de test du TP3 et sauvegarde chaque trace dans traces/.
 
-Lancer :  python run_scenarios.py          (Ollama doit tourner, TP2/data/cases.jsonl doit exister)
-         python run_scenarios.py 2        (un seul scénario)
-IMPORTANT : adaptez les questions à vos décisions (regardez ce que contient votre corpus).
-"""
 import json
 import sys
 from pathlib import Path
@@ -12,11 +7,11 @@ from agent import run_agent
 
 SCENARIOS = {
     1: ("RAG simple (une seule recherche suffit)",
-        "Un salarié peut-il être licencié pour faute grave en cas de harcèlement moral ?"),
+        "Quel est le délai de prescription de l'action en contestation d'un licenciement ?"),
     2: ("Recherche multi-étapes (trouver une affaire puis la lire)",
-        "Dans l'affaire concernant un licenciement pour inaptitude, quels sont les motifs retenus par la cour ?"),
+        "Pourquoi la cour juge-t-elle un licenciement dépourvu de cause réelle et sérieuse en l'absence de recherche de reclassement ?"),
     3: ("Information insuffisante (corpus insuffisant -> requête différente ou API externe)",
-        "Qu'est-ce que le principe de l'autorité de la chose jugée ?"),
+        "Qui était Portalis et quel rôle a-t-il joué dans la rédaction du Code Napoléon ?"),
 }
 
 Path("traces").mkdir(exist_ok=True)

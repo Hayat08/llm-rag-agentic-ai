@@ -1,7 +1,4 @@
-"""Interface Streamlit du TP3 : affiche la trace de l'agent EN DIRECT.
 
-Lancer :  streamlit run app_streamlit.py   (backend : uvicorn main:app --reload --port 8001)
-"""
 import json
 
 import requests
@@ -10,7 +7,7 @@ import streamlit as st
 API = "http://localhost:8001/agent"
 ICONES = {"DECISION": "🧭", "TOOL": "🔧", "OBSERVATION": "👁️", "CHECK": "✅", "ERROR": "❌", "FINAL": "🏁"}
 
-st.title("⚖️ Agentic RAG sur la jurisprudence")
+st.title(" Agentic RAG sur la jurisprudence")
 question = st.text_input("Votre question juridique")
 
 if st.button("Lancer l'agent", type="primary") and question:
@@ -39,7 +36,7 @@ if st.button("Lancer l'agent", type="primary") and question:
 
         st.subheader("Sources (provenance)")
         for s in final["sources"]:
-            etiquette = "📚 Corpus" if s["provenance"] == "corpus" else "🌐 Externe"
+            etiquette = " Corpus" if s["provenance"] == "corpus" else " Externe"
             utilisee = " — cité" if s["cite"] else ""
             with st.expander(f"{s['id']} · {etiquette} · {s['titre']}{utilisee}"):
                 st.write(s["texte"])
