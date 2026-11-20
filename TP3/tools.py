@@ -4,7 +4,7 @@ from pathlib import Path
 
 import requests
 
-# On réutilise rag.py et llm.py du TP2 (ajouté EN FIN de sys.path : les fichiers du TP3 restent prioritaires)
+# On réutilise rag.py et llm.py du TP2
 sys.path.append(str(Path(__file__).parent.parent / "TP2"))
 from rag import Index  # noqa: E402
 
